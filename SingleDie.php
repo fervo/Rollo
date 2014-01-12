@@ -30,4 +30,9 @@ class SingleDie implements DieInterface
 
         return sprintf('D%d:*', $this->sides);
     }
+
+    public function getExpression()
+    {
+        return 'D'.$this->sides;
+    }
 }

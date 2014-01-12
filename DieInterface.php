@@ -9,4 +9,6 @@ interface DieInterface
     public function getValue();
 
     public function getValueDescription();
+
+    public function getExpression();
 }

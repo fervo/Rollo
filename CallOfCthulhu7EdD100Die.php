@@ -95,6 +95,11 @@ class CallOfCthulhu7EdD100Die implements DieInterface
         );
     }
 
+    public function getExpression()
+    {
+        return str_pad('C100', 4+count($this->extraTens), ($this->isPenalty ? 'p' : 'b'));
+    }
+
     protected function getUsedTensDie()
     {
         if ($this->tens->getValue() == null) {

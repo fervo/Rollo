@@ -110,4 +110,43 @@ class DieCollection implements DieInterface
 
         return $description;
     }
+
+    public function getExpression()
+    {
+        return '('.implode(' '.$this->operator.' ', $this->getSubExpressions($this->dice)).')';
+    }
+
+    protected function getSubExpressions($expressions)
+    {
+        $newExpressions = [];
+        for ($i=0; $i < count($expressions); $i++) {
+            $current = $expressions[$i];
+
+            if ($current instanceOf SingleDie) {
+                $counter = 1;
+
+                for ($j=$i+1; $j < count($expressions); $j++) {
+                    $inner = $expressions[$j];
+                    if ($inner instanceOf SingleDie) {
+                        if ($current->getExpression() == $inner->getExpression()) {
+                            $i++;
+                            $counter++;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if ($counter > 1) {
+                    $newExpressions[] = $counter.$current->getExpression();
+                } else {
+                    $newExpressions[] = $current->getExpression();
+                }
+            } else {
+                $newExpressions[] = $current->getExpression();
+            }
+        }
+
+        return $newExpressions;
+    }
 }

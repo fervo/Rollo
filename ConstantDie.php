@@ -24,4 +24,9 @@ class ConstantDie implements DieInterface
     {
         return '#'.$this->value;
     }
+
+    public function getExpression()
+    {
+        return $this->value;
+    }
 }
