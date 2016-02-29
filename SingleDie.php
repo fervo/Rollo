@@ -14,7 +14,11 @@ class SingleDie implements DieInterface
 
     public function roll()
     {
-        $this->result = mt_rand(1, $this->sides);
+        if (function_exists('random_int')) {
+            $this->result = random_int(1, $this->sides);
+        } else {
+            $this->result = mt_rand(1, $this->sides);
+        }
     }
 
     public function getValue()
