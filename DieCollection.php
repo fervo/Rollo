@@ -1,19 +1,21 @@
 <?php
+declare(strict_types=1);
 
 namespace Fervo\Rollo;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use RuntimeException;
 
 /**
 * 
 */
 class DieCollection implements DieInterface
 {
-    const OPERATOR_ADDITION = '+';
-    const OPERATOR_SUBTRACTION = '-';
+    public const OPERATOR_ADDITION = '+';
+    public const OPERATOR_SUBTRACTION = '-';
 
     protected $operator;
-    protected $dice;
+    protected ArrayCollection $dice;
 
     public function __construct(array $dice = [], $operator = self::OPERATOR_ADDITION)
     {
@@ -27,21 +29,21 @@ class DieCollection implements DieInterface
         return $this->operator;
     }
 
-    public function getDice()
+    public function getDice(): array
     {
         return $this->dice->toArray();
     }
 
-    public function replaceDieWithDice(DieInterface $oldDie, array $dice)
+    public function replaceDieWithDice(DieInterface $oldDie, array $dice): void
     {
         // @todo optimize
         $index = $this->dice->indexOf($oldDie);
 
-        if ($index === false) {
-            throw new \RuntimeException("Old die to be replaced doesn't exist in collection");
+        if (false === $index) {
+            throw new RuntimeException("Old die to be replaced doesn't exist in collection");
         }
 
-        if ($index === 0) {
+        if (0 === $index) {
             $left = [];
         } else {
             $left = $this->dice->slice(0, $index);
@@ -54,34 +56,34 @@ class DieCollection implements DieInterface
         $this->addDice($right);
     }
 
-    public function addDice(array $dice)
+    public function addDice(array $dice): void
     {
         foreach ($dice as $theDie) {
             $this->addDie($theDie);
         }
     }
 
-    public function addDie(DieInterface $theDie)
+    public function addDie(DieInterface $theDie): void
     {
-        if ($this->dice->indexOf($theDie) !== false) {
+        if (false !== $this->dice->indexOf($theDie)) {
             throw new NotUniqueException($theDie);
         }
 
         $this->dice[] = $theDie;
     }
 
-    public function roll()
+    public function roll(): void
     {
         foreach ($this->dice as $theDie) {
             $theDie->roll();
         }
     }
 
-    public function getValue()
+    public function getValue(): ?int
     {
         // @todo optimize
         foreach ($this->dice as $theDie) {
-            if ($theDie->getValue() === null) {
+            if (null === $theDie->getValue()) {
                 return null;
             }
         }
@@ -89,7 +91,7 @@ class DieCollection implements DieInterface
         $total = $this->dice->first()->getValue();
 
         foreach ($this->dice->slice(1) as $theDie) {
-            if ($this->operator == self::OPERATOR_ADDITION) {
+            if ($this->operator === self::OPERATOR_ADDITION) {
                 $total += $theDie->getValue();
             } else {
                 $total -= $theDie->getValue();
@@ -99,36 +101,37 @@ class DieCollection implements DieInterface
         return $total;
     }
 
-    public function getValueDescription()
+    public function getValueDescription(): string
     {
         // @todo optimize
         $diceDescriptions = $this->dice->map(function($theDie) { return $theDie->getValueDescription(); });
 
         $description = '[';
         $description .= implode(' '.$this->operator.' ', $diceDescriptions->getValues());
-        $description .= ']='.($this->getValue() === null ? '*' : $this->getValue());
+        $description .= '] = '.($this->getValue() ?? '*');
 
         return $description;
     }
 
-    public function getExpression()
+    public function getExpression(): string
     {
         return '('.implode(' '.$this->operator.' ', $this->getSubExpressions($this->dice)).')';
     }
 
-    protected function getSubExpressions($expressions)
+    /** @noinspection ForeachInvariantsInspection */
+    protected function getSubExpressions($expressions): array
     {
         $newExpressions = [];
-        for ($i=0; $i < count($expressions); $i++) {
+        for ($i=0, $iMax = \count($expressions); $i < $iMax; $i++) {
             $current = $expressions[$i];
 
             if ($current instanceOf SingleDie) {
                 $counter = 1;
 
-                for ($j=$i+1; $j < count($expressions); $j++) {
+                for ($j=$i+1, $jMax = \count($expressions); $j < $jMax; $j++) {
                     $inner = $expressions[$j];
                     if ($inner instanceOf SingleDie) {
-                        if ($current->getExpression() == $inner->getExpression()) {
+                        if ($current->getExpression() === $inner->getExpression()) {
                             $i++;
                             $counter++;
                         }

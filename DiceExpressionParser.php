@@ -1,13 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace Fervo\Rollo;
 
+use Fervo\Rollo\Parser\OptimizationPasses\PassInterface;
+
 class DiceExpressionParser
 {
-    protected $lexer;
-    protected $parser;
-    protected $compiler;
-    protected $passes = [];
+    protected Parser\Lexer $lexer;
+    protected Parser\Parser $parser;
+    protected Parser\Compiler $compiler;
+    /** @var PassInterface[]  */
+    protected array $passes = [];
 
     public function __construct()
     {
@@ -18,7 +22,7 @@ class DiceExpressionParser
         $this->passes[] = new Parser\OptimizationPasses\RemoveSingleCollectionPass();
     }
 
-    public function parseExpression($expression)
+    public function parseExpression(string $expression): DieInterface
     {
         $tokenStream = $this->lexer->tokenize($expression);
         $node = $this->parser->parse($tokenStream);

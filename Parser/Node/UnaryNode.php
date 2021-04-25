@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -11,27 +12,28 @@
 
 namespace Fervo\Rollo\Parser\Node;
 
+use Fervo\Rollo\DieInterface;
 use Fervo\Rollo\Parser\Compiler;
 
 class UnaryNode extends Node
 {
-    private static $operators = array(
+    private static array $operators = [
         '+' => '+',
         '-' => '-',
-    );
+    ];
 
     public function __construct($operator, ConstantNode $node)
     {
         parent::__construct(
-            array('node' => $node),
-            array('operator' => $operator)
+            ['node' => $node],
+            ['operator' => $operator]
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): DieInterface
     {
         $node = $this->nodes['node'];
-        if ($this->attributes['operator'] == '-') {
+        if ('-' === $this->attributes['operator'] && $node instanceof ConstantNode) {
             $node = $node->getNegated();
         }
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -11,6 +12,7 @@
 
 namespace Fervo\Rollo\Parser\Node;
 
+use Fervo\Rollo\DieInterface;
 use Fervo\Rollo\Parser\Compiler;
 
 class MultiDieNode extends Node
@@ -18,13 +20,13 @@ class MultiDieNode extends Node
     public function __construct($num, $sides)
     {
         parent::__construct(
-            array(),
-            array('sides' => $sides, 'num' => $num)
+            [],
+            ['sides' => $sides, 'num' => $num]
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): DieInterface
     {
-        return $compiler->compileMultiDie($this->attributes['num'], $this->attributes['sides']);
+        return $compiler->compileMultiDie((int)$this->attributes['num'], (int)$this->attributes['sides']);
     }
 }

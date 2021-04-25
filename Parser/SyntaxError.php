@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -11,7 +12,9 @@
 
 namespace Fervo\Rollo\Parser;
 
-class SyntaxError extends \LogicException
+use LogicException;
+
+class SyntaxError extends LogicException
 {
     public function __construct($message, $cursor = 0)
     {

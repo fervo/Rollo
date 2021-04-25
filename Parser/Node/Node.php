@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -11,6 +12,7 @@
 
 namespace Fervo\Rollo\Parser\Node;
 
+use Fervo\Rollo\DieInterface;
 use Fervo\Rollo\Parser\Compiler;
 
 /**
@@ -18,18 +20,19 @@ use Fervo\Rollo\Parser\Compiler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Node
+abstract class Node implements NodeInterface
 {
-    public $nodes = array();
-    public $attributes = array();
+    /** @var NodeInterface[]  */
+    public array $nodes = [];
+    public array $attributes = [];
 
     /**
      * Constructor.
      *
-     * @param array $nodes      An array of nodes
+     * @param NodeInterface[] $nodes      An array of nodes
      * @param array $attributes An array of attributes
      */
-    public function __construct(array $nodes = array(), array $attributes = array())
+    public function __construct(array $nodes = [], array $attributes = [])
     {
         $this->nodes = $nodes;
         $this->attributes = $attributes;
@@ -37,14 +40,14 @@ class Node
 
     public function __toString()
     {
-        $attributes = array();
+        $attributes = [];
         foreach ($this->attributes as $name => $value) {
             $attributes[] = sprintf('%s: %s', $name, str_replace("\n", '', var_export($value, true)));
         }
 
-        $repr = array(str_replace('Ferfo\Rollo\Parser\Node\\', '', get_class($this)).'('.implode(', ', $attributes));
+        $repr = [str_replace('Fervo\Rollo\Parser\Node\\', '', \get_class($this)).'('.implode(', ', $attributes)];
 
-        if (count($this->nodes)) {
+        if (\count($this->nodes)) {
             foreach ($this->nodes as $node) {
                 foreach (explode("\n", (string) $node) as $line) {
                     $repr[] = '    '.$line;
@@ -59,8 +62,5 @@ class Node
         return implode("\n", $repr);
     }
 
-    public function compile(Compiler $compiler)
-    {
-        throw new \LogicException("Calling compile on Node baseclass is not supported");
-    }
+    abstract public function compile(Compiler $compiler): DieInterface;
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -18,15 +19,16 @@ namespace Fervo\Rollo\Parser;
  */
 class TokenStream
 {
-    public $current;
+    public Token $current;
 
-    private $tokens;
-    private $position = 0;
+    /** @var Token[]  */
+    private array $tokens;
+    private int $position = 0;
 
     /**
      * Constructor.
      *
-     * @param array $tokens An array of tokens
+     * @param Token[] $tokens An array of tokens
      */
     public function __construct(array $tokens)
     {
@@ -47,7 +49,7 @@ class TokenStream
     /**
      * Sets the pointer to the next token and returns the old one.
      */
-    public function next()
+    public function next(): void
     {
         if (!isset($this->tokens[$this->position])) {
             throw new SyntaxError('Unexpected end of expression', $this->current->cursor);
@@ -61,7 +63,7 @@ class TokenStream
     /**
      * Tests a token.
      */
-    public function expect($type, $value = null, $message = null)
+    public function expect($type, $value = null, $message = null): void
     {
         $token = $this->current;
         if (!$token->test($type, $value)) {
@@ -75,7 +77,7 @@ class TokenStream
      *
      * @return bool
      */
-    public function isEOF()
+    public function isEOF(): bool
     {
         return $this->current->type === Token::EOF_TYPE;
     }

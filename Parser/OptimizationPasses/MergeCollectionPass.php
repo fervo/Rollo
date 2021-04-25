@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Fervo\Rollo\Parser\OptimizationPasses;
 
@@ -7,7 +8,7 @@ use Fervo\Rollo\DieInterface;
 
 class MergeCollectionPass implements PassInterface
 {
-    public function run(DieInterface $theDie)
+    public function run(DieInterface $theDie): DieInterface
     {
         if ($theDie instanceOf DieCollection) {
             $this->doRun($theDie);
@@ -16,7 +17,7 @@ class MergeCollectionPass implements PassInterface
         return $theDie;
     }
 
-    protected function doRun(DieCollection $coll)
+    protected function doRun(DieCollection $coll): void
     {
         foreach ($coll->getDice() as $innerDie) {
             if ($innerDie instanceOf DieCollection) {
@@ -25,11 +26,11 @@ class MergeCollectionPass implements PassInterface
         }
     }
 
-    public function action(DieCollection $outerColl, DieCollection $innerColl)
+    public function action(DieCollection $outerColl, DieCollection $innerColl): void
     {
         $this->doRun($innerColl);
 
-        if ($innerColl->getOperator() == $outerColl->getOperator() || count($innerColl->getDice()) == 1) {
+        if ($innerColl->getOperator() === $outerColl->getOperator() || 1 === \count($innerColl->getDice())) {
             $outerColl->replaceDieWithDice($innerColl, $innerColl->getDice());
         }
     }

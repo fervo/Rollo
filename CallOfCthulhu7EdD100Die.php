@@ -1,14 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Fervo\Rollo;
 
 class CallOfCthulhu7EdD100Die implements DieInterface
 {
-    protected $tens;
-    protected $units;
+    protected SingleDie $tens;
+    protected SingleDie $units;
 
-    protected $extraTens = [];
-    protected $isPenalty = false;
+    protected array $extraTens = [];
+    protected bool $isPenalty = false;
 
     public function __construct($bonus = 0, $penalty = 0)
     {
@@ -31,7 +32,7 @@ class CallOfCthulhu7EdD100Die implements DieInterface
         }
     }
 
-    public function roll()
+    public function roll(): void
     {
         $this->tens->roll();
         $this->units->roll();
@@ -41,7 +42,7 @@ class CallOfCthulhu7EdD100Die implements DieInterface
         }
     }
 
-    public function getValue()
+    public function getValue(): ?int
     {
         $tens = $this->getUsedTensDie();
 
@@ -50,23 +51,23 @@ class CallOfCthulhu7EdD100Die implements DieInterface
 
     protected function doGetDiceValue(SingleDie $tens, SingleDie $units)
     {
-        if ($tens->getValue() === null || $units->getValue() === null) {
+        if (null === $tens->getValue() || null === $units->getValue()) {
             return null;
         }
 
         $value = $this->getTensValue($tens) + $this->getUnitsValue($units);
-        if ($value == 0) {
+        if (0 === $value) {
             return 100;
         }
 
         return $value;
     }
 
-    public function getValueDescription()
+    public function getValueDescription(): string
     {
         $total = $this->getValue();
 
-        if ($total === null) {
+        if (null === $total) {
             $total = '*';
         }
 
@@ -77,12 +78,12 @@ class CallOfCthulhu7EdD100Die implements DieInterface
             return sprintf(
                 "%s%s",
                 ($this->isPenalty ? 'P' : 'B'),
-                ($theDie->getValue() == null ? '*' : $this->getTensValue($theDie))
+                (null === $theDie->getValue() ? '*' : $this->getTensValue($theDie))
             );
         }, $unusedTens);
 
         $unused = implode(',', $unusedDiceDescriptions);
-        if (strlen($unused) > 0) {
+        if ('' !== $unused) {
             $unused .= ',';
         }
 
@@ -95,14 +96,14 @@ class CallOfCthulhu7EdD100Die implements DieInterface
         );
     }
 
-    public function getExpression()
+    public function getExpression(): string
     {
-        return str_pad('C100', 4+count($this->extraTens), ($this->isPenalty ? 'p' : 'b'));
+        return str_pad('C100', 4+ \count($this->extraTens), ($this->isPenalty ? 'p' : 'b'));
     }
 
     protected function getUsedTensDie()
     {
-        if ($this->tens->getValue() == null) {
+        if (null === $this->tens->getValue()) {
             return $this->tens;
         }
 
@@ -126,7 +127,7 @@ class CallOfCthulhu7EdD100Die implements DieInterface
 
         $usedTens = $this->getUsedTensDie();
 
-        return array_filter($dice, function ($theDie) use ($usedTens) { return $theDie !== $usedTens; });
+        return array_filter($dice, static function ($theDie) use ($usedTens) { return $theDie !== $usedTens; });
     }
 
     protected function getTensValue(SingleDie $tens)
@@ -141,7 +142,7 @@ class CallOfCthulhu7EdD100Die implements DieInterface
 
     protected function getTensValueDescription(SingleDie $tens)
     {
-        if ($tens->getValue() == null) {
+        if (null === $tens->getValue()) {
             return '*';
         }
 
@@ -150,7 +151,7 @@ class CallOfCthulhu7EdD100Die implements DieInterface
 
     protected function getUnitsValueDescription(SingleDie $units)
     {
-        if ($units->getValue() == null) {
+        if (null === $units->getValue()) {
             return '*';
         }
 

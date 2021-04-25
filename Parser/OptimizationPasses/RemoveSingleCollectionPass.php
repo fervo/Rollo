@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Fervo\Rollo\Parser\OptimizationPasses;
 
@@ -7,9 +8,9 @@ use Fervo\Rollo\DieInterface;
 
 class RemoveSingleCollectionPass implements PassInterface
 {
-    public function run(DieInterface $theDie)
+    public function run(DieInterface $theDie): DieInterface
     {
-        if ($theDie instanceOf DieCollection && count($theDie->getDice()) == 1) {
+        if ($theDie instanceOf DieCollection && 1 === \count($theDie->getDice())) {
             return $theDie->getDice()[0];
         }
 

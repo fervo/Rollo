@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is based on the Symfony package.
@@ -18,24 +19,17 @@ namespace Fervo\Rollo\Parser;
  */
 class Token
 {
-    public $value;
-    public $type;
-    public $cursor;
+    public string $value;
+    public string $type;
+    public int $cursor;
 
-    const EOF_TYPE         = 'end of expression';
-    const MULTIDIE_TYPE    = 'multidie';
-    const COCDIE_TYPE      = 'cocdie';
-    const INT_TYPE         = 'int';
-    const OPERATOR_TYPE    = 'operator';
+    public const EOF_TYPE         = 'end of expression';
+    public const MULTIDIE_TYPE    = 'multidie';
+    public const COCDIE_TYPE      = 'cocdie';
+    public const INT_TYPE         = 'int';
+    public const OPERATOR_TYPE    = 'operator';
 
-    /**
-     * Constructor.
-     *
-     * @param integer $type   The type of the token
-     * @param string  $value  The token value
-     * @param integer $cursor The cursor position in the source
-     */
-    public function __construct($type, $value, $cursor)
+    public function __construct(string $type, string $value, int $cursor)
     {
         $this->type = $type;
         $this->value = $value;
@@ -55,13 +49,13 @@ class Token
     /**
      * Tests the current token for a type and/or a value.
      *
-     * @param array|integer $type  The type to test
-     * @param string|null   $value The token value
+     * @param string $type The type to test
+     * @param string|null $value The token value
      *
      * @return Boolean
      */
-    public function test($type, $value = null)
+    public function test(string $type, ?string $value = null): bool
     {
-        return $this->type === $type && (null === $value || $this->value == $value);
+        return $this->type === $type && (null === $value || $this->value === $value);
     }
 }

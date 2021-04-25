@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -11,6 +12,7 @@
 
 namespace Fervo\Rollo\Parser\Node;
 
+use Fervo\Rollo\DieInterface;
 use Fervo\Rollo\Parser\Compiler;
 
 class ConstantNode extends Node
@@ -18,17 +20,17 @@ class ConstantNode extends Node
     public function __construct($value)
     {
         parent::__construct(
-            array(),
-            array('value' => $value)
+            [],
+            ['value' => $value]
         );
     }
 
-    public function getNegated()
+    public function getNegated(): ConstantNode
     {
-        return new static($this->attributes['value'] * -1);
+        return new static((int)$this->attributes['value'] * -1);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): DieInterface
     {
         return $compiler->compileConstant($this->attributes['value']);
     }

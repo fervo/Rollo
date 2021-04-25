@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -10,6 +11,8 @@
  */
 
 namespace Fervo\Rollo\Parser;
+
+use Fervo\Rollo\Parser\Node\NodeInterface;
 
 /**
  * Parsers a token stream.
@@ -23,39 +26,33 @@ namespace Fervo\Rollo\Parser;
  */
 class Parser
 {
-    const OPERATOR_LEFT = 1;
-    const OPERATOR_RIGHT = 2;
+    public const OPERATOR_LEFT = 1;
+    public const OPERATOR_RIGHT = 2;
 
-    private $stream;
-    private $unaryOperators;
-    private $binaryOperators;
+    private ?TokenStream $stream;
+    private array $unaryOperators;
+    private array $binaryOperators;
 
     public function __construct()
     {
-        $this->unaryOperators = array(
-            '-'   => array('precedence' => 500),
-            '+'   => array('precedence' => 500),
-        );
-        $this->binaryOperators = array(
-            '+'       => array('precedence' => 30,  'associativity' => Parser::OPERATOR_LEFT),
-            '-'       => array('precedence' => 30,  'associativity' => Parser::OPERATOR_LEFT),
-        );
+        $this->unaryOperators = [
+            '-'   => ['precedence' => 500],
+            '+'   => ['precedence' => 500],
+        ];
+        $this->binaryOperators = [
+            '+'       => ['precedence' => 30,  'associativity' => self::OPERATOR_LEFT],
+            '-'       => ['precedence' => 30,  'associativity' => self::OPERATOR_LEFT],
+        ];
     }
 
     /**
      * Converts a token stream to a node tree.
      *
-     * @param TokenStream $stream A token stream instance
-     * @param array       $names  An array of valid names
-     *
-     * @return Node A node tree
-     *
      * @throws SyntaxError
      */
-    public function parse(TokenStream $stream, $names = array())
+    public function parse(TokenStream $stream): NodeInterface
     {
         $this->stream = $stream;
-        $this->names = $names;
 
         $node = $this->parseExpression();
         if (!$stream->isEOF()) {
@@ -65,7 +62,7 @@ class Parser
         return $node;
     }
 
-    public function parseExpression($precedence = 0)
+    public function parseExpression($precedence = 0): NodeInterface
     {
         $expr = $this->getPrimary();
         $token = $this->stream->current;
@@ -86,7 +83,7 @@ class Parser
     {
         $token = $this->stream->current;
 
-        if ($token->test(Token::OPERATOR_TYPE) && isset($this->unaryOperators[$token->value])) {
+        if (isset($this->unaryOperators[$token->value]) && $token->test(Token::OPERATOR_TYPE)) {
             $operator = $this->unaryOperators[$token->value];
             $this->stream->next();
             $expr = $this->parseExpression($operator['precedence']);
@@ -113,9 +110,9 @@ class Parser
             case Token::COCDIE_TYPE:
                 $this->stream->next();
 
-                preg_match('/([0-9]*)(C|c)100([BbPp]*)/', $token->value, $match);
+                preg_match('/(\d*)([Cc])100([BbPp]*)/', $token->value, $match);
 
-                if (!count($match) == 5) {
+                if (4 !== \count($match)) {
                     throw new SyntaxError(sprintf("MultiDie token %s has invalid format", $token->value));
                 }
 
@@ -123,9 +120,9 @@ class Parser
                 $penalty = 0;
 
                 foreach (str_split($match[3]) as $extra) {
-                    if (strtolower($extra) == 'b') {
+                    if ('b' === strtolower($extra)) {
                         $bonus++;
-                    } elseif (strtolower($extra) == 'p') {
+                    } elseif ('p' === strtolower($extra)) {
                         $penalty++;
                     }
                 }
@@ -135,9 +132,9 @@ class Parser
             case Token::MULTIDIE_TYPE:
                 $this->stream->next();
 
-                preg_match('/([0-9]*)(D|d)([0-9]+)/', $token->value, $match);
+                preg_match('/(\d*)([Dd])(\d+)/', $token->value, $match);
 
-                if (!count($match) == 4) {
+                if (4 !== \count($match)) {
                     throw new SyntaxError(sprintf("MultiDie token %s has invalid format", $token->value));
                 }
 
@@ -145,7 +142,5 @@ class Parser
             default:
                 throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s"', $token->type, $token->value), $token->cursor);
         }
-
-        return $node;
     }
 }

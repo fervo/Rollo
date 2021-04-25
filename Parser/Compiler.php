@@ -1,26 +1,28 @@
 <?php
+declare(strict_types=1);
 
 namespace Fervo\Rollo\Parser;
 
 use Fervo\Rollo\CallOfCthulhu7EdD100Die;
 use Fervo\Rollo\ConstantDie;
+use Fervo\Rollo\Parser\Node\NodeInterface;
 use Fervo\Rollo\SingleDie;
 use Fervo\Rollo\DieCollection;
 use Fervo\Rollo\DieInterface;
 
 class Compiler
 {
-    public function compile(Node\Node $node)
+    public function compile(NodeInterface $node): DieInterface
     {
         return $node->compile($this);
     }
 
-    public function compileConstant($value)
+    public function compileConstant(int $value): ConstantDie
     {
         return new ConstantDie($value);
     }
 
-    public function compileMultiDie($num, $sides)
+    public function compileMultiDie(int $num, int $sides): DieCollection
     {
         $dice = [];
 
@@ -31,7 +33,7 @@ class Compiler
         return new DieCollection($dice);
     }
 
-    public function compileCocDie($num, $bonus, $penalty)
+    public function compileCocDie(int $num, int $bonus, int $penalty): DieCollection
     {
         $dice = [];
 
@@ -42,10 +44,10 @@ class Compiler
         return new DieCollection($dice);
     }
 
-    public function compileBinary($operator, DieInterface $left, DieInterface $right)
+    public function compileBinary(string $operator, DieInterface $left, DieInterface $right): DieCollection
     {
         $dice = [$left, $right];
-        if ($operator == '+') {
+        if ('+' === $operator) {
             $op = DieCollection::OPERATOR_ADDITION;
         } else {
             $op = DieCollection::OPERATOR_SUBTRACTION;

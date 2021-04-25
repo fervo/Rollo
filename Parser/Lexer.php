@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -27,45 +28,45 @@ class Lexer
      *
      * @throws SyntaxError
      */
-    public function tokenize($expression)
+    public function tokenize(string $expression): TokenStream
     {
-        $expression = str_replace(array("\r", "\n", "\t", "\v", "\f"), ' ', $expression);
+        $expression = str_replace(["\r", "\n", "\t", "\v", "\f"], ' ', $expression);
         $cursor = 0;
-        $tokens = array();
-        $end = strlen($expression);
+        $tokens = [];
+        $end = \strlen($expression);
 
         while ($cursor < $end) {
-            if (' ' == $expression[$cursor]) {
+            if (' ' === $expression[$cursor]) {
                 ++$cursor;
 
                 continue;
             }
 
 
-            if (preg_match('/[0-9]*(C|c)100[PpBb]*/A', $expression, $match, null, $cursor)) {
+            if (preg_match('/\d*([Cc])100[PpBb]*/A', $expression, $match, 0, $cursor)) {
                 // cocdie
                 $tokens[] = new Token(Token::COCDIE_TYPE, $match[0], $cursor + 1);
-                $cursor += strlen($match[0]);
-            } elseif (preg_match('/[0-9]*(D|d)[0-9]+/A', $expression, $match, null, $cursor)) {
+                $cursor += \strlen($match[0]);
+            } elseif (preg_match('/\d*([Dd])\d+/A', $expression, $match, 0, $cursor)) {
                 // multidie
                 $tokens[] = new Token(Token::MULTIDIE_TYPE, $match[0], $cursor + 1);
-                $cursor += strlen($match[0]);
-            } elseif (preg_match('/[0-9]+/A', $expression, $match, null, $cursor)) {
+                $cursor += \strlen($match[0]);
+            } elseif (preg_match('/\d+/A', $expression, $match, 0, $cursor)) {
                 // integers
                 $number = (int) $match[0];  // integers
-                $tokens[] = new Token(Token::INT_TYPE, $number, $cursor + 1);
-                $cursor += strlen($match[0]);
-            } elseif (preg_match('/\+|\-/A', $expression, $match, null, $cursor)) {
+                $tokens[] = new Token(Token::INT_TYPE, (string)$number, $cursor + 1);
+                $cursor += \strlen($match[0]);
+            } elseif (preg_match('/[+\-]/A', $expression, $match, 0, $cursor)) {
                 // operators
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
-                $cursor += strlen($match[0]);
+                $cursor += \strlen($match[0]);
             } else {
                 // unlexable
                 throw new SyntaxError(sprintf('Unexpected character "%s"', $expression[$cursor]), $cursor);
             }
         }
 
-        $tokens[] = new Token(Token::EOF_TYPE, null, $cursor + 1);
+        $tokens[] = new Token(Token::EOF_TYPE, (string)null, $cursor + 1);
 
         return new TokenStream($tokens);
     }

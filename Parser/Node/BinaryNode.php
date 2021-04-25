@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -11,19 +12,20 @@
 
 namespace Fervo\Rollo\Parser\Node;
 
+use Fervo\Rollo\DieInterface;
 use Fervo\Rollo\Parser\Compiler;
 
 class BinaryNode extends Node
 {
-    public function __construct($operator, Node $left, Node $right)
+    public function __construct($operator, NodeInterface $left, NodeInterface $right)
     {
         parent::__construct(
-            array('left' => $left, 'right' => $right),
-            array('operator' => $operator)
+            ['left' => $left, 'right' => $right],
+            ['operator' => $operator]
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): DieInterface
     {
         $compiledLeft = $this->nodes['left']->compile($compiler);
         $compiledRight = $this->nodes['right']->compile($compiler);

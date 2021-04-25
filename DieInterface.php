@@ -1,14 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Fervo\Rollo;
 
 interface DieInterface
 {
-    public function roll();
+    public function roll(): void;
 
-    public function getValue();
+    public function getValue(): ?int;
 
-    public function getValueDescription();
+    public function getValueDescription(): string;
 
-    public function getExpression();
+    public function getExpression(): string;
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -11,6 +12,7 @@
 
 namespace Fervo\Rollo\Parser\Node;
 
+use Fervo\Rollo\DieInterface;
 use Fervo\Rollo\Parser\Compiler;
 
 class CocDieNode extends Node
@@ -18,12 +20,12 @@ class CocDieNode extends Node
     public function __construct($num, $bonus, $penalty)
     {
         parent::__construct(
-            array(),
-            array('bonus' => $bonus, 'penalty' => $penalty, 'num' => $num)
+            [],
+            ['bonus' => $bonus, 'penalty' => $penalty, 'num' => $num]
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): DieInterface
     {
         return $compiler->compileCocDie($this->attributes['num'], $this->attributes['bonus'], $this->attributes['penalty']);
     }

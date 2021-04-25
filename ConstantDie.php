@@ -1,32 +1,33 @@
 <?php
+declare(strict_types=1);
 
 namespace Fervo\Rollo;
 
 class ConstantDie implements DieInterface
 {
-    protected $value;
+    protected int $value;
 
-    public function __construct($value)
+    public function __construct(int $value)
     {
         $this->value = $value;
     }
 
-    public function roll()
+    public function roll(): void
     {
     }
 
-    public function getValue()
+    public function getValue(): ?int
     {
         return $this->value;
     }
 
-    public function getValueDescription()
+    public function getValueDescription(): string
     {
         return '#'.$this->value;
     }
 
-    public function getExpression()
+    public function getExpression(): string
     {
-        return $this->value;
+        return (string)$this->value;
     }
 }
