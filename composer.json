@@ -2,9 +2,10 @@
     "name": "fervo/rollo",
     "description": "An overly complicated dice rolling library",
     "autoload": {
-        "psr-0": { "Fervo\\Rollo": "" }
+        "psr-4": {
+            "Fervo\\Rollo\\": "src/"
+        }
     },
-    "target-dir": "Fervo/Rollo",
     "require": {
         "php": ">=8.0",
         "doctrine/collections": "~1.0"
