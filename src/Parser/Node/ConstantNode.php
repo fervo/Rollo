@@ -32,6 +32,6 @@ class ConstantNode extends Node
 
     public function compile(Compiler $compiler): DieInterface
     {
-        return $compiler->compileConstant($this->attributes['value']);
+        return $compiler->compileConstant((int)$this->attributes['value']);
     }
 }
